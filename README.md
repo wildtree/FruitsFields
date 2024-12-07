@@ -1,1 +1,1 @@
-Fruits Fields is a puzzule game.
+Fruits Fields is a puzzle game.
