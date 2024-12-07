@@ -17,6 +17,7 @@ class Game
 public:
     static Game &instance() { static Game g; return g; }
     static void loop();
+    static void on_timer();
 protected:
     Game();
     ~Game();

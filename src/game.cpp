@@ -19,6 +19,14 @@ Sprite *Game::_blocks[4];
 Sprite *Game::_blank;
 Sprite *Game::_wall;
 
+static void IRAM_ATTR
+on_timer_cb()
+{
+    Game::instance().on_timer();
+}
+
+static hw_timer_t *_timer = nullptr;
+
 Game::Game()
 {
     _scene = 0;
@@ -39,6 +47,15 @@ Game::Game()
     }
     _blank = Sprites::instance().get(0);
     _wall = Sprites::instance().get(1);
+    Serial.println("Setup timer interrupt.");
+    _timer = timerBegin(0, 80, true); // timer #0, 80MHz
+    if (_timer)
+    {
+        timerAttachInterrupt(_timer, &on_timer_cb, true);
+        timerAlarmWrite(_timer, 100000, true);  // each 0.1s (100ms)
+        timerAlarmEnable(_timer);
+        Serial.println("timer is started.");
+    }
 }
 
 Game::~Game()
@@ -290,4 +307,10 @@ Game::play_game()
             stage_clear();
         }
     }
+}
+
+void
+Game::on_timer()
+{
+    if (_keyboard != nullptr) _keyboard->on_timer();
 }

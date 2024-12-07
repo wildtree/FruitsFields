@@ -9,6 +9,8 @@
 #include <textarea.h>
 #include <keyboard.h>
 
+static hw_timer_t *_timer = nullptr;
+
 void 
 setup() 
 {
@@ -21,6 +23,7 @@ setup()
 
   Serial.begin(115200);
   Serial.println("Fruits Fields for M5Stack");
+  // setup timer interrupt on timer #0,
 }
 
 void 

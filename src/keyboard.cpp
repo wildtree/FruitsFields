@@ -187,6 +187,8 @@ typedef union {
 } keyboard_t;
 
 
+static volatile int keyboardCount = 0;
+static int keyboardBufferType = 0;
 static keyboard_t keyboardReport;
 static std::queue<uint16_t> keybuf;
 
@@ -211,17 +213,20 @@ notifyCallback(NimBLERemoteCharacteristic *pRemoteCharacteristic, uint8_t *pData
 #endif
     // handle: 41 -- key / 51 -- media key
     if (length != 8 && length != 11) return; // not key data interface (maybe)
+    keyboardCount = 0;
     keyboard_t *newKeyReport = (keyboard_t*)pData;
     int buflen = 6;
     uint8_t *buf = keyboardReport.k2.keys;
     uint8_t *input = newKeyReport->k2.keys;
     uint8_t mod = newKeyReport->k2.modifiers;
+    keyboardBufferType = 0;
     if (length == 11)
     {
         buflen = 10;
         buf = keyboardReport.k1.keys;
         input = newKeyReport->k1.keys;
         mod = newKeyReport->k1.modifiers;     
+        keyboardBufferType = 1;
     }
     for (int i = 0 ; i < buflen ; i++)
     {
@@ -474,4 +479,30 @@ bool
 BTKeyBoard::exists()
 {
     return true;
+}
+
+void
+BTKeyBoard::on_timer()
+{
+    if (!connected || keybuf.size() > 30 || keyboardCount++ < 5) // every 0.5sec
+    {
+        return;
+    }
+    // keyboardCount = 0;
+    int buflen = 6;
+    uint8_t *buf = keyboardReport.k2.keys;
+    uint8_t mod = keyboardReport.k2.modifiers;
+    if (keyboardBufferType == 1)
+    {
+        buflen = 10;
+        buf = keyboardReport.k1.keys;
+        mod = keyboardReport.k1.modifiers;     
+    }
+    for (int i = 0 ; i < buflen ; i++)
+    {
+        uint8_t c = buf[i];
+        if (c == 0) continue;
+        if (keybuf.size() > 30) break;
+        keybuf.push(((uint16_t)mod << 8)|c);
+    }
 }
