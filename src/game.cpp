@@ -199,14 +199,21 @@ Game::block_check(int bx, int by, FFMap::Dir dir)
     Sprite *block = _blocks[c - 4];
     if (Sprites::instance().map()->crash(nx, ny, dir))
     {
+        M5.Speaker.tone(330,32);
         _blank->draw(M5.Display, 16 + nx * 8, 16 + ny * 8, 2.0);
     }
     else
     {
         int px = nx;
         int py = ny;
+        bool beep = true;
         while (Sprites::instance().map()->block_move(nx, ny))
         {
+            if (beep)
+            {
+                M5.Speaker.tone(330,32);
+                beep = false;
+            }
             // Serial.printf("block move loop: (nx, ny) = (%d, %d)\r\n", nx, ny);
             _blank->draw(M5.Display, 16 + px * 8, 16 + py * 8, 2.0);
             block->draw(M5.Display, 16 + nx * 8, 16 + ny * 8, 2.0);
@@ -259,6 +266,7 @@ Game::play_game()
         FFMap::Dir dir = Sprites::instance().map()->get_remkun(cx, cy);
         nx = cx;
         ny = cy;
+        int fruits = Sprites::instance().map()->fruits();
         switch (c)
         {
         case 0x1b: // ESC
@@ -290,6 +298,10 @@ Game::play_game()
         }
         if (walk)
         {
+            if (fruits != Sprites::instance().map()->fruits())
+            {
+                M5.Speaker.tone(441, 32);
+            }
             Sprites::instance().map()->get_remkun(nx, ny);
             Sprite *r = _rem[d * 2];
             Sprite *h = _rem[d * 2 + 1];

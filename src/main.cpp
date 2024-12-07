@@ -23,11 +23,14 @@ setup()
 
   Serial.begin(115200);
   Serial.println("Fruits Fields for M5Stack");
-  // setup timer interrupt on timer #0,
+
+  M5.Speaker.begin();
+  M5.Speaker.setVolume(128);
 }
 
 void 
 loop() 
 {
+  M5.update();
   Game::instance().loop();
 }
