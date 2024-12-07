@@ -182,7 +182,7 @@ Game::block_check(int bx, int by, FFMap::Dir dir)
     Sprite *block = _blocks[c - 4];
     if (Sprites::instance().map()->crash(nx, ny, dir))
     {
-        _blank->draw(16 + nx * 8, 8 + ny * 8);
+        _blank->draw(M5.Display, 16 + nx * 8, 16 + ny * 8, 2.0);
     }
     else
     {
@@ -191,14 +191,12 @@ Game::block_check(int bx, int by, FFMap::Dir dir)
         while (Sprites::instance().map()->block_move(nx, ny))
         {
             // Serial.printf("block move loop: (nx, ny) = (%d, %d)\r\n", nx, ny);
-            _blank->draw(16 + px * 8, 8 + py * 8);
-            block->draw(16 + nx * 8, 8 + ny * 8);
-            Sprites::instance().flush();
+            _blank->draw(M5.Display, 16 + px * 8, 16 + py * 8, 2.0);
+            block->draw(M5.Display, 16 + nx * 8, 16 + ny * 8, 2.0);
             px = nx;
             py = ny;
         }
     }
-    Sprites::instance().flush();
 }
 
 void
@@ -240,7 +238,7 @@ Game::play_game()
     {
         int bx, by, cx, cy, nx, ny, dx ,dy, d, id;
         bool walk = false;
-        Sprite *blank = Sprites::instance().get(0);
+        //Sprite *blank = Sprites::instance().get(0);
         FFMap::Dir dir = Sprites::instance().map()->get_remkun(cx, cy);
         nx = cx;
         ny = cy;
@@ -278,19 +276,14 @@ Game::play_game()
             Sprites::instance().map()->get_remkun(nx, ny);
             Sprite *r = _rem[d * 2];
             Sprite *h = _rem[d * 2 + 1];
-            // Serial.printf("(cx, cy) -> (nx, ny): (%d, %d) -> (%d, %d)\r\n", cx, cy, nx, ny);
-            // Serial.printf("r = %#08x / h = %#08x\r\n", r, h);
             dx = (nx - cx);
             dy = (ny - cy);
-            blank->draw(16 + cx * 8, 8 + cy * 8);
-            // Serial.println("erased.");
-            h->draw(16 + cx * 8 + dx * 4, 8 + cy * 8 + dy * 4);
-            Sprites::flush();
+            _blank->draw(M5.Display, 16 + cx * 8, 16 + cy * 8, 2.0);
+            h->draw(M5.Display, 16 + cx * 8 + dx * 4, 16 + cy * 8 + dy * 4, 2.0);
             // Serial.println("half step.");
-            blank->draw(16 + cx * 8 + dx * 4, 8 + cy * 8 + dy * 4);
-            r->draw(16 + nx * 8, 8 + ny * 8);
-            Sprites::flush();
-            // Serial.println("walked.");
+            usleep(100000); //timing -- 0.1sec
+            _blank->draw(M5.Display, 16 + cx * 8 + dx * 4, 16 + cy * 8 + dy * 4, 2.0);
+            r->draw(M5.Display, 16 + nx * 8, 16 + ny * 8, 2.0);
         }
         if (Sprites::instance().map()->fruits() == 0)
         {

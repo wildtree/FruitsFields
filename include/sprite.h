@@ -63,7 +63,7 @@ public:
         }
         else
         {
-            _sprite.pushRotateZoomWithAA(&display, (float)(16 + x + 4) * scale, (float)(8 + y + 4) * scale, 0, scale, scale);
+            _sprite.pushRotateZoomWithAA(&display, (float)(x + 4) * scale, (float)(y + 4) * scale, 0, scale, scale);
         }
     }
 };
