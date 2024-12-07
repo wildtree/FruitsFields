@@ -27,11 +27,17 @@ protected:
     static void give_up();
     static void stage_clear();
     static void block_check(int bx, int by, FFMap::Dir dir);
+    static void bgm_rewind() { bgmp = bgm; }
+    static void bgm_play();
     static uint8_t _scene;
     static KeyBoard *_keyboard;
     static uint8_t _mode;
     static TextArea *_header, *_status;
     static Sprite *_rem[8], *_blocks[4], *_blank, *_wall;
+    static bool in_play;
+    static float bgm[];
+    static float *bgmp;
+    static uint16_t bgm_cnt;
 };
 
 #endif
