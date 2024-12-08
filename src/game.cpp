@@ -33,7 +33,6 @@ float Game::bgm[] = {
 float *Game::bgmp = bgm;
 uint16_t Game::bgm_cnt = 0;
 bool Game::_bgm = true;
-bool Game::_holdBtnA = false;
 
 uint8_t Game::_demo_keys[] = {
     0x1d, 0x1d, ' ', 0x1d, 0x1d, 0x1d, 0x1e, 0x1e, 0x1e, 0x1c, ' ', 0x1c, 0x1e, 0x1f, 0x1f, 0x1c, 0x1e, ' ', 0x1c, 0x1e, ' ', 0x1e, 0x1e, 0x1f, 0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x1f, 0x1f, 0x1d, 0x1e, ' ', 0x1e, 0x1d, 0x1c, 0x1c, 0x1e, 0x1d, ' ', 0x1e, 0x1d, ' ', 0x1d, 0x1d,  0,
@@ -84,15 +83,6 @@ Game::~Game()
 void
 Game::loop()
 {
-    if (M5.BtnA.isReleased())
-    {
-        _holdBtnA = false;
-    }
-    if (!_holdBtnA && M5.BtnA.isHolding())
-    {
-        _holdBtnA = true;
-        _bgm = !_bgm;
-    }
     switch (_mode)
     {
     case 0:
@@ -377,6 +367,11 @@ Game::play_game()
             in_play = false;
             bgmp = bgm;
             give_up();
+            break;
+        case 's':
+        case 'S':
+            _bgm = !_bgm;   // flip BGM mode
+            if (_bgm) bgm_rewind();
             break;
         case 0x1c: // left
             d = 0;

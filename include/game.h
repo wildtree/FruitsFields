@@ -40,7 +40,6 @@ protected:
     static float *bgmp;
     static uint16_t bgm_cnt;
     static bool _bgm;
-    static bool _holdBtnA;
     static uint8_t _demo_keys[];
     static uint8_t *_demo_key;
 };
