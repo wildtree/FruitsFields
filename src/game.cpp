@@ -162,11 +162,11 @@ Game::title()
             Sprite *h = _rem[d * 2 + 1];
             dx = (nx - cx);
             dy = (ny - cy);
-            _blank->draw(M5.Display, 16 + cx * 8, 32 + cy * 8, 2.0);
-            h->draw(M5.Display, 16 + cx * 8 + dx * 4, 32 + cy * 8 + dy * 4, 2.0);
+            _blank->draw(M5.Display, OX + cx * 8, 2 * OY + cy * 8, SCALE);
+            h->draw(M5.Display, OX + cx * 8 + dx * 4, 2 * OY + cy * 8 + dy * 4, SCALE);
             usleep(100000); //timing -- 0.1sec
-            _blank->draw(M5.Display, 16 + cx * 8 + dx * 4, 32 + cy * 8 + dy * 4, 2.0);
-            r->draw(M5.Display, 16 + nx * 8, 32 + ny * 8, 2.0);
+            _blank->draw(M5.Display, OX + cx * 8 + dx * 4, 2 * OY + cy * 8 + dy * 4, SCALE);
+            r->draw(M5.Display, OX + nx * 8, 2 * OY + ny * 8, SCALE);
         }
         usleep(100000);
     }
@@ -179,9 +179,9 @@ Game::stage_select()
     Sprites::instance().draw_title();
     Sprites::instance().init_fields();
 
-    TextArea line1(M5.Display, 32, 120);
-    TextArea line2(M5.Display, 32, 152);
-    TextArea line3(M5.Display, 32, 184);
+    TextArea line1(M5.Display, 2 * OX, 120);
+    TextArea line2(M5.Display, 2 * OX, 152);
+    TextArea line3(M5.Display, 2 * OX, 184);
 
     line1.print("Select Starting Phase", 0x1f, TextArea::Center);
     char s[5];
@@ -229,9 +229,9 @@ Game::draw_header(int scene, int fruits)
 void
 Game::give_up()
 {
-    TextArea line1(M5.Display, 32, 72);
-    TextArea line2(M5.Display, 32, 136);
-    TextArea line3(M5.Display, 32, 152);
+    TextArea line1(M5.Display, 2 * OX, 72);
+    TextArea line2(M5.Display, 2 * OX, 136);
+    TextArea line3(M5.Display, 2 * OX, 152);
 
     line1.print("** Give Up **", 0xe3, TextArea::Center);
     line2.print("Hit [Y] key if you want to cont", 0xe3, TextArea::Center);
@@ -293,7 +293,7 @@ Game::block_check(int bx, int by, FFMap::Dir dir, int ox, int oy)
     if (Sprites::instance().map()->crash(nx, ny, dir))
     {
         M5.Speaker.tone(330,32);
-        _blank->draw(M5.Display, ox + nx * 8, oy + ny * 8, 2.0);
+        _blank->draw(M5.Display, ox + nx * 8, oy + ny * 8, SCALE);
     }
     else
     {
@@ -308,8 +308,8 @@ Game::block_check(int bx, int by, FFMap::Dir dir, int ox, int oy)
                 beep = false;
             }
             // Serial.printf("block move loop: (nx, ny) = (%d, %d)\r\n", nx, ny);
-            _blank->draw(M5.Display, ox + px * 8, oy + py * 8, 2.0);
-            block->draw(M5.Display, ox + nx * 8, oy + ny * 8, 2.0);
+            _blank->draw(M5.Display, ox + px * 8, oy + py * 8, SCALE);
+            block->draw(M5.Display, ox + nx * 8, oy + ny * 8, SCALE);
             px = nx;
             py = ny;
         }
@@ -319,9 +319,9 @@ Game::block_check(int bx, int by, FFMap::Dir dir, int ox, int oy)
 void
 Game::stage_clear()
 {
-    TextArea line1(M5.Display, 32, 72);
-    TextArea line2(M5.Display, 32, 104);
-    TextArea line3(M5.Display, 32, 136);
+    TextArea line1(M5.Display, 2 * OX, 72);
+    TextArea line2(M5.Display, 2 * OX, 104);
+    TextArea line3(M5.Display, 2 * OX, 136);
 
     line1.print("Nice Play!", 0x1f, TextArea::Center);
     line2.print("You have cleared this phase.", 0x1f, TextArea::Center);
@@ -408,12 +408,12 @@ Game::play_game()
             Sprite *h = _rem[d * 2 + 1];
             dx = (nx - cx);
             dy = (ny - cy);
-            _blank->draw(M5.Display, 16 + cx * 8, 16 + cy * 8, 2.0);
-            h->draw(M5.Display, 16 + cx * 8 + dx * 4, 16 + cy * 8 + dy * 4, 2.0);
+            _blank->draw(M5.Display, OX + cx * 8, OY + cy * 8, SCALE);
+            h->draw(M5.Display, OX + cx * 8 + dx * 4, OY + cy * 8 + dy * 4, SCALE);
             // Serial.println("half step.");
             usleep(100000); //timing -- 0.1sec
-            _blank->draw(M5.Display, 16 + cx * 8 + dx * 4, 16 + cy * 8 + dy * 4, 2.0);
-            r->draw(M5.Display, 16 + nx * 8, 16 + ny * 8, 2.0);
+            _blank->draw(M5.Display, OX + cx * 8 + dx * 4, OY + cy * 8 + dy * 4, SCALE);
+            r->draw(M5.Display, OX + nx * 8, OY + ny * 8, SCALE);
         }
         if (Sprites::instance().map()->fruits() == 0)
         {
