@@ -35,6 +35,11 @@ uint16_t Game::bgm_cnt = 0;
 bool Game::_bgm = true;
 bool Game::_holdBtnA = false;
 
+uint8_t Game::_demo_keys[] = {
+    0x1d, 0x1d, ' ', 0x1d, 0x1d, 0x1d, 0x1e, 0x1e, 0x1e, 0x1c, ' ', 0x1c, 0x1e, 0x1f, 0x1f, 0x1c, 0x1e, ' ', 0x1c, 0x1e, ' ', 0x1e, 0x1e, 0x1f, 0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x1f, 0x1f, 0x1d, 0x1e, ' ', 0x1e, 0x1d, 0x1c, 0x1c, 0x1e, 0x1d, ' ', 0x1e, 0x1d, ' ', 0x1d, 0x1d,  0,
+};
+uint8_t *Game::_demo_key = nullptr;
+
 static hw_timer_t *_timer = nullptr;
 
 Game::Game()
@@ -113,12 +118,69 @@ Game::title()
     line.flush();
     Sprites::instance().demo_map();
 
-    uint8_t c;
-    while(_keyboard->fetch_key(c))
+    // demp loop
+    for (_demo_key = _demo_keys ; *_demo_key !=0 ; _demo_key++)
     {
-        if (c == ' ') _mode = 0;
-        M5.Display.clear(BLACK);
+        uint8_t c;
+        while(_keyboard->fetch_key(c))
+        {
+            if (c == ' ') _mode = 0;
+            M5.Display.clear(BLACK);
+            return;
+        }
+        //
+        int bx, by, cx, cy, nx, ny, dx ,dy, d, id;
+        bool walk = false;
+        FFMap::Dir dir = Sprites::instance().map()->get_remkun(cx, cy);
+        nx = cx;
+        ny = cy;
+        int fruits = Sprites::instance().map()->fruits();
+        switch (*_demo_key)
+        {
+        case 0x1c: // left
+            d = 0;
+            walk = true;
+            Sprites::instance().map()->move(FFMap::Left);
+            break;
+        case 0x1d: // right
+            d = 1;
+            walk = true;
+            Sprites::instance().map()->move(FFMap::Right);
+            break;
+        case 0x1e: // up
+            d = 2;
+            walk = true;
+            Sprites::instance().map()->move(FFMap::Up);
+            break;
+        case 0x1f: // down
+            d = 3;
+            walk = true;
+            Sprites::instance().map()->move(FFMap::Down);
+            break;
+        case ' ': // hit space
+            block_check(cx, cy, dir, 16, 32);
+            break;
+        }
+        if (walk)
+        {
+            if (fruits != Sprites::instance().map()->fruits())
+            {
+                M5.Speaker.tone(441, 32);
+            }
+            Sprites::instance().map()->get_remkun(nx, ny);
+            Sprite *r = _rem[d * 2];
+            Sprite *h = _rem[d * 2 + 1];
+            dx = (nx - cx);
+            dy = (ny - cy);
+            _blank->draw(M5.Display, 16 + cx * 8, 32 + cy * 8, 2.0);
+            h->draw(M5.Display, 16 + cx * 8 + dx * 4, 32 + cy * 8 + dy * 4, 2.0);
+            usleep(100000); //timing -- 0.1sec
+            _blank->draw(M5.Display, 16 + cx * 8 + dx * 4, 32 + cy * 8 + dy * 4, 2.0);
+            r->draw(M5.Display, 16 + nx * 8, 32 + ny * 8, 2.0);
+        }
+        usleep(100000);
     }
+    usleep(1000000);
 }
 
 void
@@ -210,7 +272,7 @@ Game::give_up()
 }
 
 void
-Game::block_check(int bx, int by, FFMap::Dir dir)
+Game::block_check(int bx, int by, FFMap::Dir dir, int ox, int oy)
 {
     int nx = bx;
     int ny = by;
@@ -241,7 +303,7 @@ Game::block_check(int bx, int by, FFMap::Dir dir)
     if (Sprites::instance().map()->crash(nx, ny, dir))
     {
         M5.Speaker.tone(330,32);
-        _blank->draw(M5.Display, 16 + nx * 8, 16 + ny * 8, 2.0);
+        _blank->draw(M5.Display, ox + nx * 8, oy + ny * 8, 2.0);
     }
     else
     {
@@ -256,8 +318,8 @@ Game::block_check(int bx, int by, FFMap::Dir dir)
                 beep = false;
             }
             // Serial.printf("block move loop: (nx, ny) = (%d, %d)\r\n", nx, ny);
-            _blank->draw(M5.Display, 16 + px * 8, 16 + py * 8, 2.0);
-            block->draw(M5.Display, 16 + nx * 8, 16 + ny * 8, 2.0);
+            _blank->draw(M5.Display, ox + px * 8, oy + py * 8, 2.0);
+            block->draw(M5.Display, ox + nx * 8, oy + ny * 8, 2.0);
             px = nx;
             py = ny;
         }

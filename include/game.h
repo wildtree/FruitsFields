@@ -26,7 +26,7 @@ protected:
     static void draw_header(int scene, int fruits);
     static void give_up();
     static void stage_clear();
-    static void block_check(int bx, int by, FFMap::Dir dir);
+    static void block_check(int bx, int by, FFMap::Dir dir, int ox = 16, int oy = 16);
     static void bgm_rewind() { bgmp = bgm; }
     static void bgm_play();
     static void title();
@@ -41,6 +41,8 @@ protected:
     static uint16_t bgm_cnt;
     static bool _bgm;
     static bool _holdBtnA;
+    static uint8_t _demo_keys[];
+    static uint8_t *_demo_key;
 };
 
 #endif
