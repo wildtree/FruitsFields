@@ -38,6 +38,8 @@ protected:
     static float bgm[];
     static float *bgmp;
     static uint16_t bgm_cnt;
+    static bool _bgm;
+    static bool _holdBtnA;
 };
 
 #endif

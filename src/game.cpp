@@ -32,7 +32,8 @@ float Game::bgm[] = {
 };
 float *Game::bgmp = bgm;
 uint16_t Game::bgm_cnt = 0;
-
+bool Game::_bgm = true;
+bool Game::_holdBtnA = false;
 
 static hw_timer_t *_timer = nullptr;
 
@@ -77,6 +78,15 @@ Game::~Game()
 void
 Game::loop()
 {
+    if (M5.BtnA.isReleased())
+    {
+        _holdBtnA = false;
+    }
+    if (!_holdBtnA && M5.BtnA.isHolding())
+    {
+        _holdBtnA = true;
+        _bgm = !_bgm;
+    }
     switch (_mode)
     {
     case 0:
@@ -280,6 +290,8 @@ Game::play_game()
         switch (c)
         {
         case 0x1b: // ESC
+            in_play = false;
+            bgmp = bgm;
             give_up();
             break;
         case 0x1c: // left
@@ -336,6 +348,7 @@ Game::play_game()
 void
 Game::bgm_play()
 {
+    if (!_bgm) return;
     if (bgm_cnt++ == 2)
     {
         bgm_cnt  = 0;
