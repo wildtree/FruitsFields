@@ -29,6 +29,7 @@ protected:
     static void block_check(int bx, int by, FFMap::Dir dir);
     static void bgm_rewind() { bgmp = bgm; }
     static void bgm_play();
+    static void title();
     static uint8_t _scene;
     static KeyBoard *_keyboard;
     static uint8_t _mode;

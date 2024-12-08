@@ -66,6 +66,7 @@ Game::Game()
         timerAlarmEnable(_timer);
         Serial.println("timer is started.");
     }
+    _mode = 100; // title
 }
 
 Game::~Game()
@@ -95,14 +96,35 @@ Game::loop()
     case 1:
         play_game();
         break;
+    case 100:
+        title();
+        break;
     default:
         break;
     }
 }
 
 void
+Game::title()
+{
+    Sprites::instance().draw_title();
+    TextArea line(M5.Display, 0, 208);
+    line.print("Hit [Space] key to start.", 0x1f, TextArea::Center);
+    line.flush();
+    Sprites::instance().demo_map();
+
+    uint8_t c;
+    while(_keyboard->fetch_key(c))
+    {
+        if (c == ' ') _mode = 0;
+        M5.Display.clear(BLACK);
+    }
+}
+
+void
 Game::stage_select()
 {
+    Sprites::instance().draw_title();
     Sprites::instance().init_fields();
 
     TextArea line1(M5.Display, 32, 120);
@@ -180,7 +202,7 @@ Game::give_up()
         }
         else if(c == ' ')
         {
-            _mode = 0;
+            _mode = 100;
             M5.Display.fillRect(0, 0, M5.Display.width(), M5.Display.height(), 0);
             break;
         }

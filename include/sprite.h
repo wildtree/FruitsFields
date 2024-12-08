@@ -52,7 +52,7 @@ public:
         else
         {
             // scale するときは、指定した座標を中心にして描画されるので、オフセットしてやらないと狙った場所に描画されない。
-            _sprite.pushRotateZoomWithAA((float)(x + 4 * scale), (float)(y + 4 * scale), 0, scale, scale);
+            _sprite.pushRotateZoomWithAA((float)(x + 4) * scale, (float)(y + 4) * scale, 0, scale, scale);
         }
     }
     inline void draw(M5GFX &display, int x, int y, float scale = 1.0f)
@@ -100,11 +100,25 @@ public:
         }
         return f;
     }
+    static uint8_t demo_map()
+    {
+        uint8_t f = _map->load(100);
+        for (int x = 0 ; x < 16 ; x++)
+        {
+            for (int y = 0 ; y < 6 ; y++)
+            {
+                _sprite[_map->get(x, y)]->draw(M5.Display, 16 + x * 8, 32 + y * 8, 2.0);
+            }
+        }
+        return f;
+    }
     static FFMap *map() { return _map; }
+    static void draw_title() { _title->pushSprite(120,0); }
 protected:
     static Sprite *_sprite[num_sprites];
     static M5Canvas *_canvas;
     static FFMap *_map;
+    static M5Canvas *_title;
     Sprites();
     ~Sprites();
 };
