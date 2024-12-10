@@ -41,6 +41,8 @@ protected:
     static void bgm_rewind() { bgmp = bgm; }
     static void bgm_play();
     static void title();
+    static void demo1();
+    static void demo2();
     static uint8_t _scene;
     static KeyBoard *_keyboard;
     static uint8_t _mode;
@@ -53,6 +55,7 @@ protected:
     static bool _bgm;
     static uint8_t _demo_keys[];
     static uint8_t *_demo_key;
+    static uint8_t _demo_mode;
 };
 
 #endif

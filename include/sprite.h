@@ -66,6 +66,17 @@ public:
             _sprite.pushRotateZoomWithAA(&display, (float)(x + 4) * scale, (float)(y + 4) * scale, 0, scale, scale);
         }
     }
+    inline void draw(M5Canvas &canvas, int x, int y, float scale = 1.0f)
+    {
+        if (scale == 1.0f)
+        {
+            _sprite.pushSprite(&canvas, x, y);
+        }
+        else
+        {
+            _sprite.pushRotateZoomWithAA(&canvas, (float)(x + 4) * scale, (float)(y + 4) * scale, 0, scale, scale);
+        }
+    }
 };
 
 class Sprites

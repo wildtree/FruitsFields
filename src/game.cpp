@@ -38,6 +38,7 @@ uint8_t Game::_demo_keys[] = {
     0x1d, 0x1d, ' ', 0x1d, 0x1d, 0x1d, 0x1e, 0x1e, 0x1e, 0x1c, ' ', 0x1c, 0x1e, 0x1f, 0x1f, 0x1c, 0x1e, ' ', 0x1c, 0x1e, ' ', 0x1e, 0x1e, 0x1f, 0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x1f, 0x1f, 0x1d, 0x1e, ' ', 0x1e, 0x1d, 0x1c, 0x1c, 0x1e, 0x1d, ' ', 0x1e, 0x1d, ' ', 0x1d, 0x1d,  0,
 };
 uint8_t *Game::_demo_key = nullptr;
+uint8_t Game::_demo_mode = 0;
 
 static hw_timer_t *_timer = nullptr;
 
@@ -90,6 +91,7 @@ Game::loop()
         break;
     case 1:
         play_game();
+        _demo_mode = 0; // reset demo mode
         break;
     case 100:
         title();
@@ -100,12 +102,8 @@ Game::loop()
 }
 
 void
-Game::title()
+Game::demo1()
 {
-    Sprites::instance().draw_title();
-    TextArea line(M5.Display, 0, 208);
-    line.print("Hit [Space] key to start.", 0x1f, TextArea::Center);
-    line.flush();
     Sprites::instance().demo_map();
 
     // demp loop
@@ -171,6 +169,74 @@ Game::title()
         usleep(100000);
     }
     usleep(1000000);
+    _demo_mode = 1;
+}
+
+void
+Game::demo2()
+{
+    M5.Display.fillRect(0, 50, 320, 150, BLACK); // clear 
+    M5Canvas ds(&M5.Display);
+    ds.createSprite(256, 80);
+    ds.setColorDepth(8);
+
+    ds.setFont(&fonts::AsciiFont8x16);
+    ds.setTextColor(ds.color16to8(CYAN));
+    ds.setCursor(0,64);
+    ds.print("[SPC] Push Block! [ESC] Give Up!");
+
+    for (int i = 0 ; i < 4 ; i++)
+    {
+        ds.setTextColor(ds.color16to8((i == 2) ? YELLOW : CYAN));
+        ds.setCursor(112, 0);
+        ds.print("[UP]");
+        ds.setTextColor(ds.color16to8((i == 0) ? YELLOW : CYAN));
+        ds.setCursor(64, 24);
+        ds.print("[LEFT]");
+        ds.setTextColor(ds.color16to8((i == 1) ? YELLOW : CYAN));
+        ds.setCursor(144, 24);
+        ds.print("[RIGHT]");
+        ds.setTextColor(ds.color16to8((i == 3) ? YELLOW : CYAN));
+        ds.setCursor(104, 48);
+        ds.print("[DOWN]");
+        ds.pushSprite(32, 80);
+    
+        for (int j = 0 ; j < 2 * 10 ; j++)
+        {
+            _blank->draw(M5.Display, 76, 52, SCALE);
+            _rem[i * 2 + (j % 2)]->draw(M5.Display, 76, 52, SCALE);
+            uint8_t c;
+            if (_keyboard->fetch_key(c) && c == ' ')
+            {
+                _mode = 0; // start
+                M5.Display.clear(BLACK);
+                return;
+            }
+            usleep(100000);
+        }
+    }
+    usleep(1000000);
+    _demo_mode = 0;
+}
+
+void
+Game::title()
+{
+    Sprites::instance().draw_title();
+    TextArea line(M5.Display, 0, 208);
+    line.print("Hit [Space] key to start.", 0x1f, TextArea::Center);
+    line.flush();
+    switch (_demo_mode)
+    {
+    case 0:
+        demo1();
+        break;
+    case 1:
+        demo2();
+        break;
+    default:
+        _demo_mode = 0;
+    }    
 }
 
 void
