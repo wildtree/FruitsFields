@@ -9,6 +9,12 @@
 #include <textarea.h>
 #include <keyboard.h>
 
+#ifdef M5ATOM_LITE
+#include <m5gfx_st7789.h>
+
+M5GFX_ST7789 extDisplay;
+#endif
+
 static hw_timer_t *_timer = nullptr;
 
 void 
@@ -18,7 +24,11 @@ setup()
   auto cfg = M5.config();
   cfg.clear_display = true;
   M5.begin(cfg);
-  M5.Display.setRotation(1);
+#ifdef M5ATOM_LITE
+  extDisplay.initExt();
+  M5.addDisplay(extDisplay);
+#endif
+  M5.Display.setRotation(ROTATION);
   M5.Display.clear(BLACK);
 
   Serial.begin(115200);

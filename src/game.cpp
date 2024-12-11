@@ -45,8 +45,8 @@ static hw_timer_t *_timer = nullptr;
 Game::Game()
 {
     _scene = 0;
-    _header = new TextArea(M5.Display, 0, 0);
-    _status = new TextArea(M5.Display, 0, 224);
+    _header = new TextArea(M5.Displays(0), 0, VOFST + 0);
+    _status = new TextArea(M5.Displays(0), 0, VOFST + 224);
     _status->print("Connecting to BLE keyboard", 0x03, TextArea::Left);
     _status->flush();
     _keyboard = new BTKeyBoard();
@@ -146,7 +146,7 @@ Game::demo1()
             Sprites::instance().map()->move(FFMap::Down);
             break;
         case ' ': // hit space
-            block_check(cx, cy, dir, 16, 32);
+            block_check(cx, cy, dir, OX, OY * 2);
             break;
         }
         if (walk)
@@ -160,11 +160,11 @@ Game::demo1()
             Sprite *h = _rem[d * 2 + 1];
             dx = (nx - cx);
             dy = (ny - cy);
-            _blank->draw(M5.Display, OX + cx * 8, 2 * OY + cy * 8, SCALE);
-            h->draw(M5.Display, OX + cx * 8 + dx * 4, 2 * OY + cy * 8 + dy * 4, SCALE);
+            _blank->draw(M5.Display, OX + cx * 8, VOFST + 2 * OY + cy * 8, SCALE);
+            h->draw(M5.Display, OX + cx * 8 + dx * 4, VOFST + 2 * OY + cy * 8 + dy * 4, SCALE);
             usleep(100000); //timing -- 0.1sec
-            _blank->draw(M5.Display, OX + cx * 8 + dx * 4, 2 * OY + cy * 8 + dy * 4, SCALE);
-            r->draw(M5.Display, OX + nx * 8, 2 * OY + ny * 8, SCALE);
+            _blank->draw(M5.Display, OX + cx * 8 + dx * 4, VOFST + 2 * OY + cy * 8 + dy * 4, SCALE);
+            r->draw(M5.Display, OX + nx * 8, VOFST + 2 * OY + ny * 8, SCALE);
         }
         usleep(100000);
     }
@@ -175,36 +175,49 @@ Game::demo1()
 void
 Game::demo2()
 {
+#ifdef M5ATOM_LITE
+    M5.Display.fillRect(0, VOFST + 33, 240, VOFST + 100, BLACK); // clear 
+#else
     M5.Display.fillRect(0, 50, 320, 150, BLACK); // clear 
+#endif
     M5Canvas ds(&M5.Display);
     ds.createSprite(256, 80);
     ds.setColorDepth(8);
 
     ds.setFont(&fonts::AsciiFont8x16);
     ds.setTextColor(ds.color16to8(CYAN));
-    ds.setCursor(0,64);
+    ds.setCursor(0, VOFST + 64);
     ds.print("[SPC] Push Block! [ESC] Give Up!");
 
     for (int i = 0 ; i < 4 ; i++)
     {
         ds.setTextColor(ds.color16to8((i == 2) ? YELLOW : CYAN));
-        ds.setCursor(112, 0);
+        ds.setCursor(112, VOFST + 0);
         ds.print("[UP]");
         ds.setTextColor(ds.color16to8((i == 0) ? YELLOW : CYAN));
-        ds.setCursor(64, 24);
+        ds.setCursor(64, VOFST + 24);
         ds.print("[LEFT]");
         ds.setTextColor(ds.color16to8((i == 1) ? YELLOW : CYAN));
-        ds.setCursor(144, 24);
+        ds.setCursor(144, VOFST + 24);
         ds.print("[RIGHT]");
         ds.setTextColor(ds.color16to8((i == 3) ? YELLOW : CYAN));
-        ds.setCursor(104, 48);
+        ds.setCursor(104, VOFST + 48);
         ds.print("[DOWN]");
+    #ifdef M5ATOM_LITE
+        ds.pushRotateZoomWithAA((32 + 128) * 0.67, (VOFST + 80 + 40) * 0.67, 0, 0.67, 0.67);
+    #else
         ds.pushSprite(32, 80);
+    #endif
     
         for (int j = 0 ; j < 2 * 10 ; j++)
         {
+#ifdef M5ATOM_LITE
+            _blank->draw(M5.Display, 68, VOFST + 46, SCALE);
+            _rem[i * 2 + (j % 2)]->draw(M5.Display, 68, VOFST + 46, SCALE);
+#else
             _blank->draw(M5.Display, 76, 52, SCALE);
             _rem[i * 2 + (j % 2)]->draw(M5.Display, 76, 52, SCALE);
+#endif
             uint8_t c;
             if (_keyboard->fetch_key(c) && c == ' ')
             {
@@ -223,7 +236,7 @@ void
 Game::title()
 {
     Sprites::instance().draw_title();
-    TextArea line(M5.Display, 0, 208);
+    TextArea line(M5.Displays(0), 0, VOFST + 208);
     line.print("Hit [Space] key to start.", 0x1f, TextArea::Center);
     line.flush();
     switch (_demo_mode)
@@ -245,9 +258,9 @@ Game::stage_select()
     Sprites::instance().draw_title();
     Sprites::instance().init_fields();
 
-    TextArea line1(M5.Display, 2 * OX, 120);
-    TextArea line2(M5.Display, 2 * OX, 152);
-    TextArea line3(M5.Display, 2 * OX, 184);
+    TextArea line1(M5.Displays(0), 2 * OX, VOFST + 120);
+    TextArea line2(M5.Displays(0), 2 * OX, VOFST + 152);
+    TextArea line3(M5.Displays(0), 2 * OX, VOFST + 184);
 
     line1.print("Select Starting Phase", 0x1f, TextArea::Center);
     char s[5];
@@ -295,9 +308,9 @@ Game::draw_header(int scene, int fruits)
 void
 Game::give_up()
 {
-    TextArea line1(M5.Display, 2 * OX, 72);
-    TextArea line2(M5.Display, 2 * OX, 136);
-    TextArea line3(M5.Display, 2 * OX, 152);
+    TextArea line1(M5.Displays(0), 2 * OX, VOFST + 72);
+    TextArea line2(M5.Displays(0), 2 * OX, VOFST + 136);
+    TextArea line3(M5.Displays(0), 2 * OX, VOFST + 152);
 
     line1.print("** Give Up **", 0xe3, TextArea::Center);
     line2.print("Hit [Y] key if you want to cont", 0xe3, TextArea::Center);
@@ -359,7 +372,7 @@ Game::block_check(int bx, int by, FFMap::Dir dir, int ox, int oy)
     if (Sprites::instance().map()->crash(nx, ny, dir))
     {
         M5.Speaker.tone(330,32);
-        _blank->draw(M5.Display, ox + nx * 8, oy + ny * 8, SCALE);
+        _blank->draw(M5.Displays(0), ox + nx * 8, VOFST + oy + ny * 8, SCALE);
     }
     else
     {
@@ -374,8 +387,8 @@ Game::block_check(int bx, int by, FFMap::Dir dir, int ox, int oy)
                 beep = false;
             }
             // Serial.printf("block move loop: (nx, ny) = (%d, %d)\r\n", nx, ny);
-            _blank->draw(M5.Display, ox + px * 8, oy + py * 8, SCALE);
-            block->draw(M5.Display, ox + nx * 8, oy + ny * 8, SCALE);
+            _blank->draw(M5.Displays(0), ox + px * 8, VOFST + oy + py * 8, SCALE);
+            block->draw(M5.Displays(0), ox + nx * 8, VOFST + oy + ny * 8, SCALE);
             px = nx;
             py = ny;
         }
@@ -385,9 +398,9 @@ Game::block_check(int bx, int by, FFMap::Dir dir, int ox, int oy)
 void
 Game::stage_clear()
 {
-    TextArea line1(M5.Display, 2 * OX, 72);
-    TextArea line2(M5.Display, 2 * OX, 104);
-    TextArea line3(M5.Display, 2 * OX, 136);
+    TextArea line1(M5.Displays(0), 2 * OX, VOFST + 72);
+    TextArea line2(M5.Displays(0), 2 * OX, VOFST + 104);
+    TextArea line3(M5.Displays(0), 2 * OX, VOFST + 136);
 
     line1.print("Nice Play!", 0x1f, TextArea::Center);
     line2.print("You have cleared this phase.", 0x1f, TextArea::Center);
@@ -474,12 +487,12 @@ Game::play_game()
             Sprite *h = _rem[d * 2 + 1];
             dx = (nx - cx);
             dy = (ny - cy);
-            _blank->draw(M5.Display, OX + cx * 8, OY + cy * 8, SCALE);
-            h->draw(M5.Display, OX + cx * 8 + dx * 4, OY + cy * 8 + dy * 4, SCALE);
+            _blank->draw(M5.Displays(0), 16 + cx * 8, VOFST + 16 + cy * 8, SCALE);
+            h->draw(M5.Displays(0), 16 + cx * 8 + dx * 4, VOFST + 16 + cy * 8 + dy * 4, SCALE);
             // Serial.println("half step.");
             usleep(100000); //timing -- 0.1sec
-            _blank->draw(M5.Display, OX + cx * 8 + dx * 4, OY + cy * 8 + dy * 4, SCALE);
-            r->draw(M5.Display, OX + nx * 8, OY + ny * 8, SCALE);
+            _blank->draw(M5.Displays(0), 16 + cx * 8 + dx * 4, VOFST + 16 + cy * 8 + dy * 4, SCALE);
+            r->draw(M5.Displays(0), 16 + nx * 8, VOFST + 16 + ny * 8, SCALE);
         }
         if (Sprites::instance().map()->fruits() == 0)
         {

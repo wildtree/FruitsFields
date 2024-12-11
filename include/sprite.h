@@ -85,7 +85,14 @@ public:
     static const int num_sprites = 34;
     static Sprites &instance() { static Sprites instance; return instance; }
     static Sprite *get(int id) { return _sprite[id]; }
-    static void flush() { _canvas->pushRotateZoomWithAA(160.0f, 112.0f, 0.0f, 2.0f, 2.0f); }
+    static void flush() { 
+#ifdef M5ATOM_LITE
+        _canvas->pushRotateZoomWithAA(120.0f, VOFST + 84.0f, 0.0f, 1.5f, 1.5f);
+        Serial.println("M5ATOM_LITE to external display.");
+#else
+        _canvas->pushRotateZoomWithAA(160.0f, 112.0f, 0.0f, 2.0f, 2.0f); 
+#endif
+    }
     static void init_fields() {
         _canvas->fillRect(0, 0, _canvas->width(), _canvas->height(), 0x00); // clear buffer
         for (int x = 0 ; x < 18 ; x++)
@@ -118,13 +125,19 @@ public:
         {
             for (int y = 0 ; y < 6 ; y++)
             {
-                _sprite[_map->get(x, y)]->draw(M5.Display, 16 + x * 8, 32 + y * 8, 2.0);
+                _sprite[_map->get(x, y)]->draw(M5.Displays(0), OX + x * 8, VOFST + OY * 2 + y * 8, SCALE);
             }
         }
         return f;
     }
     static FFMap *map() { return _map; }
-    static void draw_title() { _title->pushSprite(120,0); }
+    static void draw_title() {
+#ifdef M5ATOM_LITE
+        _title->pushRotateZoomWithAA(160 * 0.67, (VOFST + 25) * 0.67, 0, 0.67, 0.67);
+#else
+        _title->pushSprite(120,0); 
+#endif
+    }
 protected:
     static Sprite *_sprite[num_sprites];
     static M5Canvas *_canvas;

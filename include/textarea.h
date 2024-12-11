@@ -15,7 +15,7 @@ public:
         : _x(x), _y(y)
     {
         _sprite = new M5Canvas(&display);
-        _sprite->createSprite(display.width() - 2 * x, 16);
+        _sprite->createSprite(320 - 2 * x, 16);
         _sprite->setColorDepth(8);
     }
     TextArea(M5Canvas &canvas, int x, int y)
@@ -54,7 +54,11 @@ public:
     }
     void flush()
     {
+    #ifdef M5ATOM_LITE
+        _sprite->pushRotateZoomWithAA((_x + _sprite->width() / 2) * 0.67, (_y + _sprite->height() / 2) * 0.67, 0, 0.67, 0.67);
+    #else
         _sprite->pushSprite(_x, _y);
+    #endif
     }
 protected:
     M5Canvas *_sprite;

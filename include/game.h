@@ -37,7 +37,7 @@ protected:
     static void draw_header(int scene, int fruits);
     static void give_up();
     static void stage_clear();
-    static void block_check(int bx, int by, FFMap::Dir dir, int ox = OX, int oy = OY);
+    static void block_check(int bx, int by, FFMap::Dir dir, int ox = 16, int oy = 16);
     static void bgm_rewind() { bgmp = bgm; }
     static void bgm_play();
     static void title();
