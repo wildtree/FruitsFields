@@ -88,7 +88,6 @@ public:
     static void flush() { 
 #ifdef M5ATOM_LITE
         _canvas->pushRotateZoomWithAA(120.0f, VOFST + 84.0f, 0.0f, 1.5f, 1.5f);
-        Serial.println("M5ATOM_LITE to external display.");
 #else
         _canvas->pushRotateZoomWithAA(160.0f, 112.0f, 0.0f, 2.0f, 2.0f); 
 #endif

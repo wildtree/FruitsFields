@@ -6,6 +6,10 @@
 #include <keyboard.h>
 #include <textarea.h>
 
+#ifdef M5STACK
+#include <screenshot.h>
+#endif
+
 
 uint8_t Game::_scene = 0;
 uint8_t Game::_mode = 0;
@@ -105,7 +109,6 @@ void
 Game::demo1()
 {
     Sprites::instance().demo_map();
-
     // demp loop
     for (_demo_key = _demo_keys ; *_demo_key !=0 ; _demo_key++)
     {
@@ -475,6 +478,11 @@ Game::play_game()
         case ' ': // hit space
             block_check(cx, cy, dir);
             break;
+#ifdef M5STACK
+        case '@':
+            ScreenShot::instance().take();
+            break;
+#endif
         }
         if (walk)
         {

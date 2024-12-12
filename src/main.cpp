@@ -11,8 +11,11 @@
 
 #ifdef M5ATOM_LITE
 #include <m5gfx_st7789.h>
-
 M5GFX_ST7789 extDisplay;
+#endif
+#ifdef M5STACK
+#include <Wire.h>
+#include <SD.h>
 #endif
 
 static hw_timer_t *_timer = nullptr;
@@ -31,6 +34,14 @@ setup()
   M5.Display.setRotation(ROTATION);
   M5.Display.clear(BLACK);
 
+#ifdef M5STACK
+  uint8_t ssPin = M5.getPin(m5::pin_name_t::sd_spi_ss);
+  while (false == SD.begin(ssPin /*GPIO_NUM_4*/, SPI, 25000000))
+  {
+    M5.Display.println("SD Wait ...");
+    delay(500);
+  }
+#endif
   Serial.begin(115200);
   Serial.println("Fruits Fields for M5Stack");
 
