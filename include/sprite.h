@@ -132,7 +132,7 @@ public:
     static FFMap *map() { return _map; }
     static void draw_title() {
 #ifdef M5ATOM_LITE
-        _title->pushRotateZoomWithAA(160 * 0.67, (VOFST + 25) * 0.67, 0, 0.67, 0.67);
+        _title->pushRotateZoomWithAA(160 * 0.75, (VOFST + 25) * 0.75, 0, 0.75, 0.75);
 #else
         _title->pushSprite(120,0); 
 #endif

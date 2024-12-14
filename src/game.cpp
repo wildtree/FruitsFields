@@ -242,7 +242,8 @@ Game::demo2()
         ds.setCursor(104, VOFST + 48);
         ds.print("[DOWN]");
     #ifdef M5ATOM_LITE
-        ds.pushRotateZoomWithAA((32 + 128) * 0.67, (VOFST + 80 + 40) * 0.67, 0, 0.67, 0.67);
+        //ds.pushRotateZoomWithAA((32 + 128) * 0.67, (VOFST + 80 + 40) * 0.67, 0, 0.67, 0.67);
+        ds.pushRotateZoomWithAA(160 * 0.75, (VOFST + 80 + 24) * 0.75, 0, 0.75, 0.75);
     #else
         ds.pushSprite(32, 80);
     #endif
@@ -250,8 +251,8 @@ Game::demo2()
         for (int j = 0 ; j < 2 * 10 ; j++)
         {
 #ifdef M5ATOM_LITE
-            _blank->draw(M5.Display, 68, VOFST + 46, SCALE);
-            _rem[i * 2 + (j % 2)]->draw(M5.Display, 68, VOFST + 46, SCALE);
+            _blank->draw(M5.Display, 76, VOFST + 44, SCALE);
+            _rem[i * 2 + (j % 2)]->draw(M5.Display, 76, VOFST + 44, SCALE);
 #else
             _blank->draw(M5.Display, 76, 52, SCALE);
             _rem[i * 2 + (j % 2)]->draw(M5.Display, 76, 52, SCALE);
@@ -469,7 +470,7 @@ Game::game_clear()
         screen->setCursor(x, y);
         screen->print(_end_roll[i]);
 #ifdef M5ATOM_LITE
-        screen->pushRotateZoomWithAA(120, 84, 0, 0.67, 0.67);
+        screen->pushRotateZoomWithAA(120, 94, 0, 0.75, 0.75);
 #else
         screen->pushSprite(0, 50);
 #endif
