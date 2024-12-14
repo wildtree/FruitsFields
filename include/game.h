@@ -11,6 +11,7 @@
 #include <textarea.h>
 #include <ffmap.h>
 #include <keyboard.h>
+#include <string>
 
 #ifndef OX
 #define OX (16)
@@ -43,6 +44,7 @@ protected:
     static void title();
     static void demo1();
     static void demo2();
+    static void game_clear();
     static uint8_t _scene;
     static KeyBoard *_keyboard;
     static uint8_t _mode;
@@ -56,6 +58,8 @@ protected:
     static uint8_t _demo_keys[];
     static uint8_t *_demo_key;
     static uint8_t _demo_mode;
+    static uint8_t _stages;
+    static String _end_roll[];
 };
 
 #endif

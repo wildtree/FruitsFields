@@ -15,8 +15,8 @@ public:
         : _x(x), _y(y)
     {
         _sprite = new M5Canvas(&display);
-        _sprite->createSprite(320 - 2 * x, 16);
         _sprite->setColorDepth(8);
+        _sprite->createSprite(320 - 2 * x, 16);
     }
     TextArea(M5Canvas &canvas, int x, int y)
         : _x(x), _y(y)
@@ -72,8 +72,8 @@ public:
         : _x(x), _y(y), _w(w), _h(h), _tx(0), _ty(0)
     {
         _sprite = new M5Canvas(&display);
-        _sprite->createSprite(_w, _h);
         _sprite->setColorDepth(8);
+        _sprite->createSprite(_w, _h);
     }
     MultiLineTextArea(M5Canvas &canvas, int x, int y, int w, int h)
         : _x(x), _y(y), _w(w), _h(h), _tx(0), _ty(0)

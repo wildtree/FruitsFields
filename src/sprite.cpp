@@ -109,16 +109,16 @@ M5Canvas *Sprites::_title = nullptr;
 Sprites::Sprites()
 {
     _canvas = new M5Canvas(&M5.Displays(0));
-    _canvas->createSprite(160, 96);
     _canvas->setColorDepth(8);
+    _canvas->createSprite(160, 96);
     for (int i = 0 ; i < num_sprites ; i++)
     {
         _sprite[i] = new Sprite(*_canvas, _sprite_data[i]);
     }
     _map = new FFMap();
     _title = new M5Canvas(&M5.Displays(0));
-    _title->createSprite(80,50);
     _title->setColorDepth(8);
+    _title->createSprite(80,50);
     for (int y = 0 ; y < 50 ; y++)
     {
         for (int x = 0 ; x < 80 ; x++)

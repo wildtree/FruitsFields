@@ -9,6 +9,7 @@
 #ifdef M5STACK
 #include <screenshot.h>
 #endif
+#include <string>
 
 
 uint8_t Game::_scene = 0;
@@ -43,8 +44,42 @@ uint8_t Game::_demo_keys[] = {
 };
 uint8_t *Game::_demo_key = nullptr;
 uint8_t Game::_demo_mode = 0;
+uint8_t Game::_stages = 0;
 
 static hw_timer_t *_timer = nullptr;
+
+
+String Game::_end_roll[] = {
+    "WITHOUT MISSING!",
+    "SPECIAL THANKS FOR YOUR PLAYING!",
+    "** STAFF **",
+    "ORIGINAL IDEA BY",
+    "TOS",
+    "PROGRAM",
+    "FOR PC-8001 BY TOS",
+    "FOR MZ-2000 BY COPY MAMO",
+    "FOR X1 BY ZERO",
+    "FOR FM-7 BY 7A9NIQ",
+    "FOR PC-1350 BY SEK",
+    "FOR PC-1250 BY SYO",
+    "FOR PC-6001 MK2 BY HIRO",
+    "FOR M5Stack/Core BY HIRO",
+    "MUSIC CREATE BY",
+    "ZERO",
+    "CHARACTER DESIGN BY",
+    "TOS",
+    "COPY MAMO",
+    "ZERO",
+    "PATTERN CREATE BY",
+    "TOS",
+    "COPY MAMO",
+    "SEK",
+    "KKK",
+    ".JR",
+    "SYO",
+    "HIT [SPACE] KEY TO CONTINUE",
+    ""
+};
 
 Game::Game()
 {
@@ -296,6 +331,7 @@ Game::stage_select()
             break;
         }
     }
+    _stages = 100; // 100 stages to be cleared.
 }
 
 void
@@ -399,8 +435,67 @@ Game::block_check(int bx, int by, FFMap::Dir dir, int ox, int oy)
 }
 
 void
+Game::game_clear()
+{
+    M5.Displays(0).clear(BLACK);
+
+    M5Canvas *screen = new M5Canvas(&M5.Displays(0));
+    screen->setColorDepth(8);
+    screen->createSprite(320, 150);
+
+    uint8_t buf[screen->width()];
+
+    Sprites::instance().draw_title();
+    screen->setFont(&fonts::AsciiFont8x16);
+    screen->setTextColor((uint8_t)0x1f);
+    screen->fillRect(0, 0, screen->width(), screen->height(), 0);
+    int fh = fonts::AsciiFont8x16.height;
+
+    int y = 0;
+    for (int i = 0 ; !_end_roll[i].isEmpty() ; i++)
+    {
+        int tw = screen->textWidth(_end_roll[i]);
+        int x = (screen->width() - tw) / 2;
+        if (y > screen->height() - fh)
+        {
+            for (int sy = 0 ; sy < screen->height() - fh ; sy ++)
+            {
+                screen->readRect(0, sy + fh, screen->width(), 1, buf);
+                screen->pushImage(0, sy, screen->width(), 1, buf);
+            }
+            y -= fh;
+            screen->fillRect(0, y, screen->width(), fh, 0);
+        }
+        screen->setCursor(x, y);
+        screen->print(_end_roll[i]);
+#ifdef M5ATOM_LITE
+        screen->pushRotateZoomWithAA(120, 84, 0, 0.67, 0.67);
+#else
+        screen->pushSprite(0, 50);
+#endif
+        y += fh;
+        usleep(1000000);
+    }
+    uint8_t c;
+    while(!_keyboard->fetch_key(c))
+    {
+        if (c == ' ') break;
+    }
+    _mode = 100;
+    _demo_mode = 0;
+    delete screen;
+    M5.Displays(0).clear(BLACK);
+    return;
+}
+
+void
 Game::stage_clear()
 {
+    if (--_stages == 0)
+    {
+        game_clear();
+        return;
+    }
     TextArea line1(M5.Displays(0), 2 * OX, VOFST + 72);
     TextArea line2(M5.Displays(0), 2 * OX, VOFST + 104);
     TextArea line3(M5.Displays(0), 2 * OX, VOFST + 136);
