@@ -45,6 +45,7 @@ uint8_t Game::_demo_keys[] = {
 uint8_t *Game::_demo_key = nullptr;
 uint8_t Game::_demo_mode = 0;
 uint8_t Game::_stages = 0;
+uint8_t Game::_keymap[] = { 0x50, 28, 0x4f, 29, 0x52, 30,  0x51, 31, 0x2c, ' ',  0x29, 27,  0x16, 's', 0x1f, '@', 0, 0 };
 
 static hw_timer_t *_timer = nullptr;
 
@@ -118,6 +119,20 @@ Game::~Game()
     delete _header;
     delete _status;
     delete _keyboard;
+}
+
+bool
+Game::keyscan(uint8_t &code)
+{
+    for (int i = 0 ; _keymap[2 * i] != 0 ; i++)
+    {
+        if (_keyboard->is_pressed(_keymap[2 * i]))
+        {
+            code = _keymap[2 * i + 1];
+            return true;
+        }
+    }
+    return false;
 }
 
 void
@@ -530,7 +545,11 @@ Game::play_game()
     draw_header(_scene, Sprites::instance().map()->fruits());
     uint8_t c;
     in_play = true;
+#if 0
     while(_keyboard->fetch_key(c))
+#else
+    while (keyscan(c))
+#endif
     {
         int bx, by, cx, cy, nx, ny, dx ,dy, d, id;
         bool walk = false;
@@ -544,6 +563,7 @@ Game::play_game()
         case 0x1b: // ESC
             in_play = false;
             bgmp = bgm;
+            _keyboard->flush();
             give_up();
             break;
         case 's':
@@ -602,8 +622,10 @@ Game::play_game()
         {
             in_play = false;
             bgmp = bgm;
+            _keyboard->flush();
             stage_clear();
         }
+        usleep(100000); //timing -- 0.1sec
     }
 }
 

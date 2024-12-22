@@ -195,7 +195,7 @@ static std::queue<uint16_t> keybuf;
 static void
 notifyCallback(NimBLERemoteCharacteristic *pRemoteCharacteristic, uint8_t *pData, size_t length, bool isNotify)
 {
-#if 0
+#if 1
     std::string str = (isNotify == true) ? "Notification" : "Indication";
     str += " from ";
     str += pRemoteCharacteristic->getRemoteService()->getClient()->getPeerAddress().toString();
@@ -505,4 +505,40 @@ BTKeyBoard::on_timer()
         if (keybuf.size() > 30) break;
         keybuf.push(((uint16_t)mod << 8)|c);
     }
+}
+
+void
+BTKeyBoard::flush()
+{
+    keyboardCount = 0;
+    while (!keybuf.empty())
+    {
+        keybuf.pop();
+    }
+    while (!_buf.empty())
+    {
+        _buf.pop();
+    }
+}
+
+bool
+BTKeyBoard::is_pressed(uint8_t keycode)
+{
+    if (!connected) return false;
+    int buflen = 6;
+    uint8_t *buf = keyboardReport.k2.keys;
+    uint8_t mod = keyboardReport.k2.modifiers;
+    if (keyboardBufferType == 1)
+    {
+        buflen = 10;
+        buf = keyboardReport.k1.keys;
+        mod = keyboardReport.k1.modifiers;     
+    }
+    for (int i = 0 ; i < buflen ; i++)
+    {
+        if (buf[i] == keycode) {
+            return true;
+        }
+    }
+    return false;
 }

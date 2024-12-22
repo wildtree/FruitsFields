@@ -33,6 +33,7 @@ public:
 protected:
     Game();
     ~Game();
+    static bool keyscan(uint8_t &code);
     static void stage_select();
     static void play_game();
     static void draw_header(int scene, int fruits);
@@ -60,6 +61,7 @@ protected:
     static uint8_t _demo_mode;
     static uint8_t _stages;
     static String _end_roll[];
+    static uint8_t _keymap[];
 };
 
 #endif

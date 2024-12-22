@@ -21,6 +21,8 @@ public:
     virtual bool fetch_key(uint8_t &c) = 0;
     virtual bool exists() = 0;
     virtual void on_timer() = 0;
+    virtual void flush() = 0;
+    virtual bool is_pressed(uint8_t keycode) = 0;
 
     static const int I2C_ADDR = 0x08;
     enum kbd_type_t { unknown = -1, faces = 0, cardputer = 1, ble = 2 };
@@ -44,6 +46,8 @@ public:
     virtual bool exists() override;
     virtual void on_timer() override {}
     virtual inline kbd_type_t keyboard_type() override { return faces; }
+    virtual void flush() override {}
+    virtual bool is_pressed(uint8_t keycode) override { return false; }
 
     static const int INTR = 5;
 };
@@ -64,6 +68,8 @@ public:
     virtual bool exists() override;
     virtual void on_timer() override {}
     virtual inline kbd_type_t keyboard_type() override { return faces; }
+    virtual void flush() override {}
+    virtual bool is_pressed(uint8_t keycode) override { return false; }
 
     static const int INTR = 33;
 };
@@ -85,7 +91,8 @@ public:
     virtual bool exists() override;
     virtual void on_timer() override {}
     virtual inline kbd_type_t keyboard_type() override { return cardputer; }
-
+    virtual void flush() override {}
+    virtual bool is_pressed(uint8_t keycode) override { return false; }
 };
 #endif
 
@@ -126,6 +133,8 @@ public:
     virtual bool exists() override;
     virtual void on_timer() override;
     virtual inline kbd_type_t keyboard_type() override { return ble; }
+    virtual void flush() override;
+    virtual bool is_pressed(uint8_t keycode) override;
 
     static const char *HID_SERVICE;
 //  static const char *HID_REPORT_MAP;
