@@ -191,11 +191,12 @@ static volatile int keyboardCount = 0;
 static int keyboardBufferType = 0;
 static keyboard_t keyboardReport;
 static std::queue<uint16_t> keybuf;
+static const int keybuf_max = 30;
 
 static void
 notifyCallback(NimBLERemoteCharacteristic *pRemoteCharacteristic, uint8_t *pData, size_t length, bool isNotify)
 {
-#if 1
+#if 0
     std::string str = (isNotify == true) ? "Notification" : "Indication";
     str += " from ";
     str += pRemoteCharacteristic->getRemoteService()->getClient()->getPeerAddress().toString();
@@ -232,6 +233,7 @@ notifyCallback(NimBLERemoteCharacteristic *pRemoteCharacteristic, uint8_t *pData
     {
         uint8_t c = input[i];
         if (c == 0) continue;
+        if (keybuf.size() > keybuf_max) break;
         if (memchr(buf, c, buflen) == NULL) keybuf.push(((uint16_t)mod << 8)|c);
     }
     memcpy(&keyboardReport, pData, length);
@@ -502,7 +504,7 @@ BTKeyBoard::on_timer()
     {
         uint8_t c = buf[i];
         if (c == 0) continue;
-        if (keybuf.size() > 30) break;
+        if (keybuf.size() > keybuf_max) break;
         keybuf.push(((uint16_t)mod << 8)|c);
     }
 }
